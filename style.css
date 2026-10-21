@@ -47,6 +47,182 @@ ul { list-style: none; }
 button { cursor: pointer; border: none; background: none; }
 
 /* =========================================================
+   PASSWORD LOCK SCREEN
+   ========================================================= */
+.lock-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1a0510 0%, #3a0820 40%, #1e0a18 70%, #2c0f1a 100%);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.lock-screen.unlocking {
+  opacity: 0;
+  transform: scale(1.05);
+  pointer-events: none;
+}
+
+/* Animated background hearts */
+.lock-bg-hearts {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.lock-float-heart {
+  position: absolute;
+  bottom: -60px;
+  color: rgba(201,125,160,0.25);
+  animation: floatUp linear infinite;
+  user-select: none;
+}
+
+/* Glass card */
+.lock-card {
+  position: relative;
+  z-index: 2;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 28px;
+  padding: 3rem 2.8rem 2.5rem;
+  max-width: 420px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.5), 0 0 60px rgba(201,125,160,0.15);
+  animation: lockCardIn 0.9s cubic-bezier(0.4,0,0.2,1) both;
+}
+@keyframes lockCardIn {
+  from { opacity: 0; transform: translateY(40px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.lock-icon-wrap {
+  margin-bottom: 0.8rem;
+}
+.lock-pulse-heart {
+  display: inline-block;
+  color: #e63d5a;
+  font-size: 3rem;
+  animation: heartbeat 1.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 18px rgba(230,61,90,0.7));
+}
+
+.lock-brand {
+  font-family: var(--font-script);
+  font-size: 2rem;
+  color: var(--champagne);
+  letter-spacing: 0.08em;
+  text-shadow: 0 2px 12px rgba(212,175,122,0.5);
+  margin-bottom: 0.3rem;
+}
+.lock-heart-inline { color: var(--rose); }
+
+.lock-title {
+  font-family: var(--font-serif);
+  font-size: 1.9rem;
+  font-weight: 400;
+  color: var(--white);
+  margin-bottom: 0.7rem;
+  letter-spacing: 0.03em;
+}
+.lock-subtitle {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  color: rgba(240,195,212,0.75);
+  line-height: 1.7;
+  margin-bottom: 2rem;
+}
+
+/* OTP boxes */
+.lock-otp-row {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+.lock-otp-box {
+  width: 62px;
+  height: 68px;
+  border-radius: 14px;
+  border: 2px solid rgba(201,125,160,0.35);
+  background: rgba(255,255,255,0.07);
+  color: var(--white);
+  font-family: var(--font-sans);
+  font-size: 1.6rem;
+  font-weight: 600;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+  caret-color: var(--rose);
+  -webkit-text-security: disc;
+}
+.lock-otp-box:focus {
+  border-color: var(--rose);
+  background: rgba(201,125,160,0.12);
+  box-shadow: 0 0 20px rgba(201,125,160,0.3);
+  transform: scale(1.07);
+}
+.lock-otp-box.filled {
+  border-color: var(--champagne);
+  background: rgba(212,175,122,0.1);
+}
+.lock-otp-box.shake {
+  animation: otpShake 0.5s ease;
+}
+@keyframes otpShake {
+  0%,100% { transform: translateX(0); }
+  20%     { transform: translateX(-8px); }
+  40%     { transform: translateX(8px); }
+  60%     { transform: translateX(-5px); }
+  80%     { transform: translateX(5px); }
+}
+
+/* Error message */
+.lock-error {
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  color: #f07090;
+  min-height: 1.2rem;
+  margin-bottom: 0.8rem;
+  letter-spacing: 0.05em;
+}
+
+/* Unlock button */
+.lock-btn {
+  width: 100%;
+  padding: 0.95rem 2rem;
+  border-radius: var(--radius-xl);
+  background: linear-gradient(135deg, var(--burgundy) 0%, #a03060 100%);
+  color: var(--white);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  border: 2px solid rgba(255,255,255,0.15);
+  box-shadow: 0 8px 32px rgba(107,26,42,0.5);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+  cursor: pointer;
+  margin-bottom: 1rem;
+}
+.lock-btn:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 16px 48px rgba(107,26,42,0.65);
+}
+.lock-btn:active { transform: scale(0.98); }
+
+.lock-hint {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.82rem;
+  color: rgba(240,195,212,0.45);
+}
+
+/* =========================================================
    FLOATING HEARTS
    ========================================================= */
 .floating-hearts {

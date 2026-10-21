@@ -12,6 +12,28 @@
 </head>
 <body>
 
+  <!-- ===================== PASSWORD LOCK SCREEN ===================== -->
+  <div class="lock-screen" id="lockScreen">
+    <div class="lock-bg-hearts" id="lockHearts" aria-hidden="true"></div>
+    <div class="lock-card" id="lockCard">
+      <div class="lock-icon-wrap" aria-hidden="true">
+        <div class="lock-pulse-heart">❤</div>
+      </div>
+      <div class="lock-brand">P <span class="lock-heart-inline">❤</span> D</div>
+      <h1 class="lock-title">Our Love Story</h1>
+      <p class="lock-subtitle">This page is private & made with love 💕<br/>Enter the secret code to enter</p>
+      <div class="lock-otp-row" id="lockOtpRow">
+        <input class="lock-otp-box" id="otp0" maxlength="1" type="password" inputmode="numeric" pattern="[0-9]" autocomplete="off" aria-label="Digit 1" />
+        <input class="lock-otp-box" id="otp1" maxlength="1" type="password" inputmode="numeric" pattern="[0-9]" autocomplete="off" aria-label="Digit 2" />
+        <input class="lock-otp-box" id="otp2" maxlength="1" type="password" inputmode="numeric" pattern="[0-9]" autocomplete="off" aria-label="Digit 3" />
+        <input class="lock-otp-box" id="otp3" maxlength="1" type="password" inputmode="numeric" pattern="[0-9]" autocomplete="off" aria-label="Digit 4" />
+      </div>
+      <div class="lock-error" id="lockError" aria-live="polite"></div>
+      <button class="lock-btn" id="lockBtn">Enter ❤️</button>
+      <p class="lock-hint">Hint: The password only the two of us know 🤫</p>
+    </div>
+  </div>
+
   <!-- ===================== NAVIGATION ===================== -->
   <nav class="nav" id="navbar">
     <div class="nav-brand">P <span class="heart-inline">❤</span> D</div>

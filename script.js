@@ -6,6 +6,139 @@
 'use strict';
 
 // ─────────────────────────────────────────────
+// 0. PASSWORD LOCK SCREEN
+// ─────────────────────────────────────────────
+(function initLockScreen() {
+  const lockScreen = document.getElementById('lockScreen');
+  if (!lockScreen) return;
+
+  // If already unlocked in this session, hide immediately
+  if (sessionStorage.getItem('pd_unlocked') === 'true') {
+    lockScreen.style.display = 'none';
+    return;
+  }
+
+  // Prevent scrolling while locked
+  document.body.style.overflow = 'hidden';
+
+  const CORRECT_PASSWORD = '2255';
+  const inputs = [
+    document.getElementById('otp0'),
+    document.getElementById('otp1'),
+    document.getElementById('otp2'),
+    document.getElementById('otp3'),
+  ];
+  const lockError = document.getElementById('lockError');
+  const lockBtn   = document.getElementById('lockBtn');
+  const lockHearts = document.getElementById('lockHearts');
+
+  // Create floating hearts for lock screen background
+  const symbols = ['\u2764', '\u2661', '\u2665', '\u2764'];
+  for (let i = 0; i < 16; i++) {
+    const h = document.createElement('span');
+    h.className = 'lock-float-heart';
+    h.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+    h.setAttribute('aria-hidden', 'true');
+    h.style.fontSize = (0.6 + Math.random() * 1.4) + 'rem';
+    h.style.left = Math.random() * 100 + 'vw';
+    h.style.animationDuration = (10 + Math.random() * 16) + 's';
+    h.style.animationDelay   = (Math.random() * 15) + 's';
+    lockHearts.appendChild(h);
+  }
+
+  // Auto-focus first input
+  setTimeout(() => inputs[0] && inputs[0].focus(), 400);
+
+  // OTP input handling — auto advance & backspace
+  inputs.forEach((input, idx) => {
+    input.addEventListener('input', (e) => {
+      const val = e.target.value;
+      // Keep only last character and only digits
+      const digit = val.replace(/\D/g, '').slice(-1);
+      e.target.value = digit;
+
+      if (digit) {
+        e.target.classList.add('filled');
+        lockError.textContent = '';
+        // Move to next
+        if (idx < inputs.length - 1) {
+          inputs[idx + 1].focus();
+        } else {
+          // All filled — auto submit
+          attemptUnlock();
+        }
+      } else {
+        e.target.classList.remove('filled');
+      }
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !input.value && idx > 0) {
+        inputs[idx - 1].focus();
+        inputs[idx - 1].value = '';
+        inputs[idx - 1].classList.remove('filled');
+      }
+      if (e.key === 'Enter') {
+        attemptUnlock();
+      }
+    });
+
+    // Only allow digit keys
+    input.addEventListener('keypress', (e) => {
+      if (!/[0-9]/.test(e.key)) e.preventDefault();
+    });
+
+    // On mobile paste
+    input.addEventListener('paste', (e) => {
+      e.preventDefault();
+      const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
+      pasted.split('').slice(0, 4).forEach((ch, i) => {
+        if (inputs[i]) {
+          inputs[i].value = ch;
+          inputs[i].classList.add('filled');
+        }
+      });
+      if (pasted.length >= 4) attemptUnlock();
+    });
+  });
+
+  lockBtn.addEventListener('click', attemptUnlock);
+
+  function attemptUnlock() {
+    const entered = inputs.map(i => i.value).join('');
+    if (entered.length < 4) {
+      lockError.textContent = 'Please enter all 4 digits 💕';
+      inputs[entered.length] && inputs[entered.length].focus();
+      return;
+    }
+    if (entered === CORRECT_PASSWORD) {
+      // ✅ Correct — unlock with animation
+      lockScreen.classList.add('unlocking');
+      sessionStorage.setItem('pd_unlocked', 'true');
+      setTimeout(() => {
+        lockScreen.style.display = 'none';
+        document.body.style.overflow = '';
+      }, 750);
+    } else {
+      // ❌ Wrong — shake and show error
+      lockError.textContent = 'Incorrect password. Try again ❤️';
+      inputs.forEach(inp => {
+        inp.value = '';
+        inp.classList.remove('filled');
+        inp.classList.remove('shake');
+        void inp.offsetWidth; // force reflow
+        inp.classList.add('shake');
+      });
+      inputs[0].focus();
+      // Remove shake after animation
+      setTimeout(() => inputs.forEach(inp => inp.classList.remove('shake')), 600);
+    }
+  }
+})();
+
+
+
+// ─────────────────────────────────────────────
 // 1. NAVIGATION
 // ─────────────────────────────────────────────
 const navbar    = document.getElementById('navbar');
